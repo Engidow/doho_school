@@ -1,0 +1,16 @@
+{
+  "name": "doha-school-mern",
+  "version": "1.0.0",
+  "description": "Doha-Model School MERN Stack Application",
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "seed": "cd backend && npm run seed",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd backend && npm start"
+  },
+  "keywords": ["mern", "school", "react", "nodejs", "mongodb"],
+  "author": "Doha-Model School",
+  "license": "ISC"
+}
