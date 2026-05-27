@@ -1,0 +1,21 @@
+services:
+  # 1. Qaybta Backend-ka (Node.js API)
+  - type: web
+    name: doha-school-backend
+    env: node
+    rootDir: doha-school/backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
+  # 2. Qaybta Frontend-ka (React Static Site)
+  - type: web
+    name: doha-school-frontend
+    env: static
+    rootDir: doha-school/frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist # Ama 'build' haddii aad isticmaasho Create React App oo aysan Vite ahayn

@@ -1,5 +1,5 @@
 const multer = require("multer");
-const supabase = require("../config/supabase"); // Hubi inuu sax yahay path-ka faylka sare
+const supabase = require("../supabase"); //  Kani waa meesha saxda ah// Hubi inuu sax yahay path-ka faylka sare
 
 // Waxaan isticmaalaynaa MemoryStorage si uu sawirka kombuyuutarka u dhaafin, toosna Memory-ga u geyno
 const storage = multer.memoryStorage();
