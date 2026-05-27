@@ -1,32 +1,46 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const multer = require("multer");
+const supabase = require("../config/supabase"); // Hubi inuu sax yahay path-ka faylka sare
 
-const createStorage = (folder) => {
-  const dir = path.join(__dirname, '../uploads', folder);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+// Waxaan isticmaalaynaa MemoryStorage si uu sawirka kombuyuutarka u dhaafin, toosna Memory-ga u geyno
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-  return multer.diskStorage({
-    destination: (req, file, cb) => cb(null, dir),
-    filename: (req, file, cb) => {
-      const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
-      cb(null, uniqueName);
+// Middleware qaas ah oo sawirka u wareejinaya Supabase
+const uploadToSupabase = async (req, res, next) => {
+  if (!req.file) return next(); // Haddii aan sawir la soo dooran, iska gudbi
+
+  try {
+    // Samee magac u gaar ah sawirka si aanay u isku dhex khaldomin (e.g., 1716654-sawir.jpg)
+    const fileName = `${Date.now()}-${req.file.originalname}`;
+
+    // U raddo sawirka Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(process.env.SUPABASE_BUCKET_NAME)
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: true,
+      });
+
+    if (error) {
+      console.error("Supabase Upload Error:", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Sawirka waa la raddi waayey!" });
     }
-  });
+
+    // Soo saar Link-ga rasmiga ah ee sawirka (Public URL)
+    const { data: publicUrlData } = supabase.storage
+      .from(process.env.SUPABASE_BUCKET_NAME)
+      .getPublicUrl(fileName);
+
+    // Ku keydi Link-ga cusub ee 'req.file.path' si Controller-kaaga uusan u garan isbeddelka
+    req.file.path = publicUrlData.publicUrl;
+
+    next();
+  } catch (err) {
+    console.error("Upload Middleware error:", err);
+    res.status(500).json({ success: false, message: "Server upload error" });
+  }
 };
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|gif|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
-  if (extname && mimetype) return cb(null, true);
-  cb(new Error('Only image files are allowed!'));
-};
-
-const uploadImage = (folder) => multer({
-  storage: createStorage(folder),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-  fileFilter
-});
-
-module.exports = { uploadImage };
+module.exports = { upload, uploadToSupabase };
