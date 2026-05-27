@@ -13,7 +13,8 @@ services:
         value: 5000
 
   # 2. Qaybta Frontend-ka (React Static Site)
-  - type: static #  Halkan ayaa la saxay (Kani waa qaabka saxda ah ee React)
+  - type: web # Kani waa sax (Render waxay adeegsanaysaa 'web')
+    env: static # Kan ayaa sheegaya inuu yahay Static Site (React)
     name: doha-school-frontend
     rootDir: doha-school/frontend
     buildCommand: npm install && npm run build
