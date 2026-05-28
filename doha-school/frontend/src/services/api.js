@@ -2,7 +2,7 @@ import axios from "axios";
 import { store, logout } from "../context/store";
 
 const api = axios.create({
-  // Halkan ayaan u beddelnay qaabka Vite si uu u akhriyo URL-ka rasmiga ah
+  // Kani waa qaabka rasmiga ah ee Vite u akhrinayo deegaanka dhabta ah
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   headers: { "Content-Type": "application/json" },
 });
