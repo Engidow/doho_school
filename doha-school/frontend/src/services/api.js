@@ -2,8 +2,11 @@ import axios from "axios";
 import { store, logout } from "../context/store";
 
 const api = axios.create({
-  // Kani waa qaabka rasmiga ah ee Vite u akhrinayo deegaanka dhabta ah
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  // Kani wuxuu hubinayaa REACT_APP marka hore ee Render, ka dib VITE, ka dibna caadiga
+  baseURL:
+    process.env.REACT_APP_API_URL ||
+    import.meta.env?.VITE_API_URL ||
+    "https://doha-school.onrender.com/api",
   headers: { "Content-Type": "application/json" },
 });
 
