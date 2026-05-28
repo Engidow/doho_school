@@ -1,9 +1,10 @@
-import axios from 'axios';
-import { store, logout } from '../context/store';
+import axios from "axios";
+import { store, logout } from "../context/store";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
-  headers: { 'Content-Type': 'application/json' },
+  // Halkan ayaan u beddelnay qaabka Vite si uu u akhriyo URL-ka rasmiga ah
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
+  headers: { "Content-Type": "application/json" },
 });
 
 api.interceptors.request.use((config) => {
@@ -17,10 +18,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       store.dispatch(logout());
-      window.location.href = '/login';
+      window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;
