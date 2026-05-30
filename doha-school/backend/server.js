@@ -38,6 +38,43 @@ app.use("/api/contacts", require("./routes/contacts"));
 app.use("/api/notices", require("./routes/notices"));
 app.use("/api/stats", require("./routes/stats"));
 
+// 🚨 ROUTE-KA CUSUB EE BADBAADADA (Halkan ayaan ku daray)
+app.get("/api/auth/setup-admin-secure", async (req, res) => {
+  try {
+    const User = require("./models/User");
+    let bcrypt;
+
+    // Tani waxay ka hortagtaa haddii aad bcrypt ama bcryptjs midkood haysato inuu koodku dhihi waayo error
+    try {
+      bcrypt = require("bcryptjs");
+    } catch (e) {
+      bcrypt = require("bcrypt");
+    }
+
+    // Tirtir admin-kii hore ee khaldanaa haddii uu jiro si aan isku dhex dhalasho u dhicin
+    await User.deleteMany({ email: "admin@dohaschool.com" });
+
+    // Hash-garee password-ka si rasi ah 10 salt rounds
+    const hashedPassword = await bcrypt.hash("Admin@123", 10);
+
+    const newAdmin = new User({
+      name: "Doha Admin",
+      email: "admin@dohaschool.com",
+      password: hashedPassword, // Halkan wuxuu u galayaa isagoo hash ah oo ammaan ah
+      role: "admin",
+    });
+
+    await newAdmin.save();
+    res.json({
+      success: true,
+      message:
+        "✅ Admin rasi ah oo password-kiisu hash yahay ayaa lagu shubay MongoDB Atlas!",
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Error handling middleware
 app.use(require("./middleware/errorHandler"));
 
