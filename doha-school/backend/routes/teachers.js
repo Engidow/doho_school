@@ -9,14 +9,30 @@ const { upload, uploadToSupabase } = require("../middleware/upload");
 // @GET /api/teachers - public view for everyone
 router.get("/", async (req, res) => {
   try {
+    // Badbaado: Hubi in Model-ku uu jiro kahor intaan la garaacin database-ka
+    if (!Teacher) {
+      return res
+        .status(500)
+        .json({
+          success: false,
+          message: "Teacher model is not defined in models/index.js",
+        });
+    }
+
     const { featured, limit } = req.query;
-    const query = { isActive: true };
+    const query = {}; // Waan ka saarnay 'isActive: true' si koodku u san u crash-garoobin haddii field-kaas uusan hadda u dhisneyn ardayda/macallimiinta cusub
+
     if (featured === "true") query.featured = true;
+
     let q = Teacher.find(query).sort({ createdAt: -1 });
     if (limit) q = q.limit(Number(limit));
+
     const teachers = await q;
-    res.json({ success: true, teachers });
+
+    // Had iyo jeer u soo celi Array, xataa haddii uu maran yahay []
+    res.json({ success: true, teachers: teachers || [] });
   } catch (err) {
+    console.error("❌ Error in GET /api/teachers:", err.message); // Tani waxay logs-ka Render ku tusaysaa dhibka dhabta ah
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -38,10 +54,10 @@ router.get("/all", protect, async (req, res) => {
       .sort({ createdAt: -1 });
     res.json({
       success: true,
-      teachers,
+      teachers: teachers || [],
       total,
       page: Number(page),
-      pages: Math.ceil(total / limit),
+      pages: Math.ceil(total / limit) || 1, // Badbaado haddii total uu yahay 0
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -79,7 +95,6 @@ router.put(
     try {
       const data = { ...req.body };
 
-      // req.file.path hadda waa Supabase URL-kii rasmiga ahaa
       if (req.file) data.photo = req.file.path;
 
       const teacher = await Teacher.findByIdAndUpdate(req.params.id, data, {
