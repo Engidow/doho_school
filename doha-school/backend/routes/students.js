@@ -26,12 +26,13 @@ router.get("/", protect, async (req, res) => {
 
     res.json({
       success: true,
-      students,
+      students: students || [], // Had iyo jeer u soo celi Array maran haddii waxba la waayo
       total,
       page: Number(page),
-      pages: Math.ceil(total / limit),
+      pages: Math.ceil(total / limit) || 1, // 🔥 BADBAADO: Marna 0 ha u soo celin si uusan Frontend-ku u crash-garoobin
     });
   } catch (err) {
+    console.error("❌ Error in GET /api/students:", err.message); // Logs-ka Render ayay ku tusaysaa dhibka
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -46,6 +47,10 @@ router.get("/:id", protect, async (req, res) => {
         .json({ success: false, message: "Student not found" });
     res.json({ success: true, student });
   } catch (err) {
+    console.error(
+      `❌ Error in GET /api/students/${req.params.id}:`,
+      err.message,
+    );
     res.status(500).json({ success: false, message: err.message });
   }
 });
