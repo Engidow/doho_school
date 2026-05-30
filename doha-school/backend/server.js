@@ -7,7 +7,7 @@ require("dotenv").config(); // Khadkan ayaa soo kicinaya .env
 
 const app = express();
 
-// Middleware - KAN CUSUB OO CORS-KA AH OO KELIYA AYAA LA BEDDELAY
+// Middleware
 app.use(
   cors({
     origin: [
@@ -34,40 +34,18 @@ app.use("/api/teachers", require("./routes/teachers"));
 app.use("/api/admissions", require("./routes/admissions"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/gallery", require("./routes/gallery"));
-app.use("/api/contacts", require("./routes/contacts"));
+app.use("/api/contacts", require("./routes/notices")); // badbaado
 app.use("/api/notices", require("./routes/notices"));
 app.use("/api/stats", require("./routes/stats"));
 
-// 🚨 ROUTE-KA CUSUB EE BADBAADADA (WAA LA SAXAY MODEL-KA OO WAXAA LAGA DHIGAY ADMIN)
-app.get("/api/auth/setup-admin-secure", async (req, res) => {
+// 🚨 EMERGENCY ROUTE: Kani wuxuu si nadiif ah u banaynayaa database-ka khaldan
+app.get("/api/auth/clean-db", async (req, res) => {
   try {
-    const Admin = require("./models/Admin"); // Waa la saxay halkan
-    let bcrypt;
-
-    try {
-      bcrypt = require("bcryptjs");
-    } catch (e) {
-      bcrypt = require("bcrypt");
-    }
-
-    // Tirtir wixii admin ah oo hore u jiray si aan isku dhex dhalasho u dhicin
-    await Admin.deleteMany({ email: "admin@dohaschool.com" });
-
-    // Hash-garee password-ka si rasi ah 10 salt rounds
-    const hashedPassword = await bcrypt.hash("Admin@123", 10);
-
-    const newAdmin = new Admin({
-      name: "Doha Admin",
-      email: "admin@dohaschool.com", // Halkan hadda waa lowercase diyaar u ah login-kaaga
-      password: hashedPassword,
-      role: "admin",
-    });
-
-    await newAdmin.save();
+    const Admin = require("./models/Admin");
+    await Admin.deleteMany({}); // Wuxuu tirtirayaa wixii admin ah oo khaldan oo database-ka ku dhex jiray
     res.json({
       success: true,
-      message:
-        "✅ Admin rasi ah oo password-kiisu hash yahay ayaa lagu shubay MongoDB Atlas!",
+      message: "✅ Database-kii waa la sifeeyay! Hadda is-diiwaangeli.",
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -88,7 +66,6 @@ app.get("/api/health", (req, res) => {
 
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
-
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
