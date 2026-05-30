@@ -2,11 +2,11 @@ import axios from "axios";
 import { store, logout } from "../context/store";
 
 const api = axios.create({
-  // Kani wuxuu hubinayaa REACT_APP marka hore ee Render, ka dib VITE, ka dibna caadiga
+  // Waxaan saxnay Link-ga rasmiga ah ee Backend-kaaga Render (lagu daray -backend)
   baseURL:
     process.env.REACT_APP_API_URL ||
     import.meta.env?.VITE_API_URL ||
-    "https://doha-school.onrender.com/api",
+    "https://doha-school-backend.onrender.com/api",
   headers: { "Content-Type": "application/json" },
 });
 
@@ -19,7 +19,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Haddii uu yahay 401 laakiin uusan joogin bogga login-ka laftiisa
+    if (
+      error.response?.status === 401 &&
+      !window.location.pathname.includes("/login")
+    ) {
       store.dispatch(logout());
       window.location.href = "/login";
     }
