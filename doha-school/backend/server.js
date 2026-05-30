@@ -38,29 +38,28 @@ app.use("/api/contacts", require("./routes/contacts"));
 app.use("/api/notices", require("./routes/notices"));
 app.use("/api/stats", require("./routes/stats"));
 
-// 🚨 ROUTE-KA CUSUB EE BADBAADADA (Halkan ayaan ku daray)
+// 🚨 ROUTE-KA CUSUB EE BADBAADADA (WAA LA SAXAY MODEL-KA OO WAXAA LAGA DHIGAY ADMIN)
 app.get("/api/auth/setup-admin-secure", async (req, res) => {
   try {
-    const User = require("./models/User");
+    const Admin = require("./models/Admin"); // Waa la saxay halkan
     let bcrypt;
 
-    // Tani waxay ka hortagtaa haddii aad bcrypt ama bcryptjs midkood haysato inuu koodku dhihi waayo error
     try {
       bcrypt = require("bcryptjs");
     } catch (e) {
       bcrypt = require("bcrypt");
     }
 
-    // Tirtir admin-kii hore ee khaldanaa haddii uu jiro si aan isku dhex dhalasho u dhicin
-    await User.deleteMany({ email: "admin@dohaschool.com" });
+    // Tirtir wixii admin ah oo hore u jiray si aan isku dhex dhalasho u dhicin
+    await Admin.deleteMany({ email: "admin@dohaschool.com" });
 
     // Hash-garee password-ka si rasi ah 10 salt rounds
     const hashedPassword = await bcrypt.hash("Admin@123", 10);
 
-    const newAdmin = new User({
+    const newAdmin = new Admin({
       name: "Doha Admin",
-      email: "admin@dohaschool.com",
-      password: hashedPassword, // Halkan wuxuu u galayaa isagoo hash ah oo ammaan ah
+      email: "admin@dohaschool.com", // Halkan hadda waa lowercase diyaar u ah login-kaaga
+      password: hashedPassword,
       role: "admin",
     });
 
@@ -90,7 +89,6 @@ app.get("/api/health", (req, res) => {
 // Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
 
-// KAN AA RIKHSOO: Kaliya wuxuu hadda xogta ka rabaa faylka .env
 const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
