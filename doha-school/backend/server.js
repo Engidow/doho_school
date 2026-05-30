@@ -7,13 +7,19 @@ require("dotenv").config(); // Khadkan ayaa soo kicinaya .env
 
 const app = express();
 
-// Middleware
+// Middleware - KAN CUSUB OO CORS-KA AH OO KELIYA AYAA LA BEDDELAY
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://doha-school-frontend.vercel.app",
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
