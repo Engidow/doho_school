@@ -34,7 +34,9 @@ app.use("/api/teachers", require("./routes/teachers"));
 app.use("/api/admissions", require("./routes/admissions"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/gallery", require("./routes/gallery"));
-app.use("/api/contacts", require("./routes/notices")); // badbaado
+
+// 🔥 WAXAA LA SAXAY HALKAN: Hadda contacts waxay toos u aadeysaa route-keeda saxda ah!
+app.use("/api/contacts", require("./routes/contacts"));
 app.use("/api/notices", require("./routes/notices"));
 app.use("/api/stats", require("./routes/stats"));
 
