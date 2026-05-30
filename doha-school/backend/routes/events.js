@@ -12,11 +12,16 @@ router.get("/", async (req, res) => {
     const { limit, category } = req.query;
     const query = { isPublished: true };
     if (category) query.category = category;
+
     let q = Event.find(query).sort({ date: -1 });
     if (limit) q = q.limit(Number(limit));
+
     const events = await q;
-    res.json({ success: true, events });
+
+    // 🔥 BADBAADO: Had iyo jeer u soo celi Array maran [] haddii database-ku maran yahay
+    res.json({ success: true, events: events || [] });
   } catch (err) {
+    console.error("❌ Error in GET /api/events:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -25,8 +30,11 @@ router.get("/", async (req, res) => {
 router.get("/all", protect, async (req, res) => {
   try {
     const events = await Event.find().sort({ date: -1 });
-    res.json({ success: true, events });
+
+    // 🔥 BADBAADO: Sidoo kale u sii ammaan qaybta Admin-ka
+    res.json({ success: true, events: events || [] });
   } catch (err) {
+    console.error("❌ Error in GET /api/events/all:", err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -62,12 +70,19 @@ router.put(
     try {
       const data = { ...req.body };
 
-      // req.file.path hadda wuxuu si toos ah u yahay link-ga rasmiga ah ee Supabase URL
       if (req.file) data.image = req.file.path;
 
       const event = await Event.findByIdAndUpdate(req.params.id, data, {
         new: true,
       });
+
+      // 🔥 BADBAADO: Hubi haddii dhacdada la raadinayo la waayo
+      if (!event) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Event not found" });
+      }
+
       res.json({ success: true, event });
     } catch (err) {
       res.status(500).json({ success: false, message: err.message });
@@ -78,8 +93,16 @@ router.put(
 // 5. Tirtirista Dhacdo
 router.delete("/:id", protect, async (req, res) => {
   try {
-    await Event.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: "Deleted" });
+    const event = await Event.findByIdAndDelete(req.params.id);
+
+    // 🔥 BADBAADO: Hubi haddii dhacdada mar hore la tirtiray
+    if (!event) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Event not found" });
+    }
+
+    res.json({ success: true, message: "Deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
