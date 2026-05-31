@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { FiUser, FiBook, FiAward, FiMail } from "react-icons/fi";
 import api from "../services/api";
 
-// Waxaa la saxay qaabka animation-ka si uu 'custom prop' u akhriyo
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i = 0) => ({
@@ -13,7 +12,6 @@ const fadeUp = {
   }),
 };
 
-// Ka soo qaado URL-ka salka ah deegaanka (Environment Variables) halkii aad ka adkayn lahayd localhost
 const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 function TeacherCard({ teacher, index }) {
@@ -27,10 +25,10 @@ function TeacherCard({ teacher, index }) {
       className="card p-6 text-center group hover:-translate-y-2 transition-all duration-300"
     >
       <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center overflow-hidden">
-        {teacher.photo ? (
+        {teacher?.photo ? (
           <img
             src={`${BASE_URL}${teacher.photo}`}
-            alt={teacher.name}
+            alt={teacher?.name}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -38,33 +36,33 @@ function TeacherCard({ teacher, index }) {
         )}
       </div>
       <h3 className="font-display font-bold text-gray-900 dark:text-white text-lg mb-1">
-        {teacher.name}
+        {teacher?.name}
       </h3>
       <p className="text-primary-600 dark:text-primary-400 text-sm font-medium mb-2">
-        {teacher.subject}
+        {teacher?.subject}
       </p>
 
-      {teacher.qualification && (
+      {teacher?.qualification && (
         <p className="text-gray-400 text-xs mb-3 flex items-center justify-center gap-1">
           <FiAward size={12} />
           {teacher.qualification}
         </p>
       )}
 
-      {teacher.experience && (
+      {teacher?.experience && (
         <p className="text-gray-400 text-xs mb-4 flex items-center justify-center gap-1">
           <FiBook size={12} />
           {teacher.experience} experience
         </p>
       )}
 
-      {teacher.bio && (
+      {teacher?.bio && (
         <p className="text-gray-500 dark:text-gray-400 text-xs leading-relaxed mb-4 line-clamp-2">
           {teacher.bio}
         </p>
       )}
 
-      {teacher.email && (
+      {teacher?.email && (
         <a
           href={`mailto:${teacher.email}`}
           className="inline-flex items-center gap-1 text-xs text-primary-600 hover:text-primary-800 transition-colors"
@@ -127,12 +125,15 @@ export default function TeachersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Waxaan ku darnay jidka saxda ah ee backend-kaaga uu garanayo ee ah '/teachers/all'
     api
-      .get("/teachers")
+      .get("/teachers/all")
       .then(({ data }) => {
-        // Hubi haddii xogta si sax ah u timid iyo haddii kale
-        if (data && data.teachers && data.teachers.length > 0) {
-          setTeachers(data.teachers);
+        // Maadaama backend-ku uu soo celin karo qaab ka duwan, labada xaaladoodba waa la hubiyay:
+        const realTeachers = data?.teachers || data;
+
+        if (realTeachers && realTeachers.length > 0) {
+          setTeachers(realTeachers);
         } else {
           setTeachers(demoTeachers);
         }
@@ -178,7 +179,7 @@ export default function TeachersPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {teachers.map((t, i) => (
                 <TeacherCard
-                  key={t._id || `teacher-${i}`}
+                  key={t?._id || `teacher-${i}`}
                   teacher={t}
                   index={i}
                 />
