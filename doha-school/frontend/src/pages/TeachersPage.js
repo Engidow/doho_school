@@ -1,3 +1,4 @@
+// TeachersPage.js
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FiUser, FiBook, FiAward, FiMail } from "react-icons/fi";
@@ -12,14 +13,17 @@ const fadeUp = {
   }),
 };
 
-// ✅ FUNCTION CUSUB - BASE_URL bedeshay
+// ✅ FIX - SAXIDDA MAREEYAHA URL-KA SAWIRADA MACALLIMIINTA
 const getImageUrl = (photo) => {
   if (!photo) return null;
   if (photo.startsWith("http://") || photo.startsWith("https://")) {
-    return photo; // Supabase URL - toos celi
+    return photo; // Supabase URL - toos u celi
   }
-  const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-  return `${BASE_URL}${photo}`; // Local path - BASE_URL ku dar
+  const BASE_URL =
+    process.env.REACT_APP_API_URL ||
+    "https://doha-school-backend.onrender.com/api";
+  const baseWithoutApi = BASE_URL.replace(/\/api$/, "");
+  return `${baseWithoutApi}${photo}`; // Local path
 };
 
 function TeacherCard({ teacher, index }) {
@@ -35,7 +39,7 @@ function TeacherCard({ teacher, index }) {
       <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center overflow-hidden">
         {teacher?.photo ? (
           <img
-            src={getImageUrl(teacher.photo)} // ✅ SAXAN
+            src={getImageUrl(teacher.photo)}
             alt={teacher?.name}
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -158,7 +162,6 @@ export default function TeachersPage() {
 
   return (
     <div>
-      {/* Hero Section */}
       <section className="hero-gradient py-24 relative overflow-hidden">
         <div className="absolute inset-0 hero-pattern opacity-20"></div>
         <div className="relative max-w-4xl mx-auto px-4 text-center text-white">
@@ -175,11 +178,9 @@ export default function TeachersPage() {
         </div>
       </section>
 
-      {/* Teachers Grid */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           {loading ? (
-            // Skeleton Loading
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
                 <div key={`skeleton-${i}`} className="card p-6 animate-pulse">

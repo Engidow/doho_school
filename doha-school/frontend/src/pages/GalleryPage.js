@@ -1,3 +1,4 @@
+// GalleryPage.js
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiImage } from "react-icons/fi";
@@ -12,21 +13,20 @@ const fadeUp = {
   }),
 };
 
-// ✅ FIX - localhost bedeshay environment variable
+// ✅ HELITAANKA URL-KA SAWIRKA (Supabase ama Local Backend)
 const getImageUrl = (image) => {
   if (!image) return null;
   if (image.startsWith("http://") || image.startsWith("https://")) {
-    return image; // Supabase URL - toos celi
+    return image; // Supabase URL - toos u celi
   }
   const BASE_URL =
     process.env.REACT_APP_API_URL ||
     "https://doha-school-backend.onrender.com/api";
-  // /api ka jar haddii uu ku dhammaado
   const baseWithoutApi = BASE_URL.replace(/\/api$/, "");
   return `${baseWithoutApi}${image}`;
 };
 
-// Demo gallery with colored boxes
+// Demo gallery oo loo diyaariyey haddii database-ku maran yahay
 const demoGallery = [
   {
     _id: "1",
@@ -64,24 +64,6 @@ const demoGallery = [
     category: "classroom",
     color: "from-pink-400 to-pink-600",
   },
-  {
-    _id: "7",
-    title: "Computer Lab",
-    category: "classroom",
-    color: "from-indigo-400 to-indigo-600",
-  },
-  {
-    _id: "8",
-    title: "Annual Day Celebration",
-    category: "events",
-    color: "from-yellow-400 to-yellow-600",
-  },
-  {
-    _id: "9",
-    title: "Sports Tournament",
-    category: "sports",
-    color: "from-red-400 to-red-600",
-  },
 ];
 
 export default function GalleryPage() {
@@ -101,6 +83,15 @@ export default function GalleryPage() {
   const cats = ["all", "events", "classroom", "sports", "graduation", "campus"];
   const filtered =
     filter === "all" ? gallery : gallery.filter((g) => g.category === filter);
+
+  // ✅ FUNCTION-KA BADBAADADA: Haddii sawirka live-ka ah uu khaldamo, koodka ma crash-garoobayo
+  const handleImageError = (e) => {
+    e.target.style.display = "none"; // Sawirka xumaaday qari
+    const fallback = e.target.nextSibling; // Soo qabo Div-ka fallback-ga ah ee hoos jooga
+    if (fallback) {
+      fallback.style.display = "flex"; // Muuji div-ka fallback-ga ah
+    }
+  };
 
   return (
     <div>
@@ -122,6 +113,7 @@ export default function GalleryPage() {
 
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
+          {/* Filter Tabs */}
           <div className="flex flex-wrap gap-3 justify-center mb-10">
             {cats.map((c) => (
               <button
@@ -134,7 +126,8 @@ export default function GalleryPage() {
             ))}
           </div>
 
-          <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+          {/* Gallery Grid - Masonry Fixed */}
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
             {filtered.map((item, i) => (
               <motion.div
                 key={item._id}
@@ -144,27 +137,32 @@ export default function GalleryPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 onClick={() => setSelected(item)}
-                className="break-inside-avoid rounded-2xl overflow-hidden cursor-pointer group relative"
+                className="break-inside-avoid display-inline-block w-full rounded-2xl overflow-hidden cursor-pointer group relative bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
                 {item.image ? (
-                  <img
-                    src={getImageUrl(item.image)}
-                    alt={item.title}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.style.display = "none";
-                    }}
-                    className="w-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  <div className="relative w-full overflow-hidden">
+                    <img
+                      src={getImageUrl(item.image)}
+                      alt={item.title}
+                      onError={handleImageError}
+                      className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500 block"
+                    />
+                    {/* ✅ FALLBACK PLACEHOLDER (Haddii sawirku khaldamo kani ayaa soo baxaya) */}
+                    <div className="hidden aspect-square bg-gradient-to-br from-gray-400 to-gray-600 items-center justify-center w-full h-48">
+                      <FiImage size={40} className="text-white opacity-70" />
+                    </div>
+                  </div>
                 ) : (
                   <div
-                    className={`aspect-square bg-gradient-to-br ${item.color} flex items-center justify-center group-hover:scale-105 transition-transform duration-500`}
+                    className={`aspect-square bg-gradient-to-br ${item.color || "from-primary-400 to-primary-600"} flex items-center justify-center group-hover:scale-105 transition-transform duration-500`}
                   >
                     <FiImage size={40} className="text-white opacity-70" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-end p-4">
-                  <p className="text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-end p-4">
+                  <p className="text-white font-medium text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 line-clamp-2">
                     {item.title}
                   </p>
                 </div>
@@ -174,54 +172,54 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Lightbox */}
+      {/* Lightbox / Modal */}
       <AnimatePresence>
         {selected && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
             onClick={() => setSelected(null)}
           >
             <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               className="relative max-w-3xl w-full"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setSelected(null)}
-                className="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors"
+                className="absolute -top-12 right-0 text-white/70 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
               >
-                <FiX size={24} />
+                <FiX size={20} />
               </button>
-              {selected.image ? (
-                <img
-                  src={getImageUrl(selected.image)}
-                  alt={selected.title}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = "none";
-                  }}
-                  className="w-full rounded-2xl object-contain max-h-[80vh]"
-                />
-              ) : (
-                <div
-                  className={`aspect-video bg-gradient-to-br ${selected.color} rounded-2xl flex items-center justify-center`}
-                >
-                  <FiImage size={80} className="text-white opacity-50" />
-                </div>
-              )}
+
+              <div className="bg-gray-900/40 rounded-2xl p-2 border border-white/10">
+                {selected.image ? (
+                  <img
+                    src={getImageUrl(selected.image)}
+                    alt={selected.title}
+                    className="w-full rounded-xl object-contain max-h-[75vh] mx-auto"
+                  />
+                ) : (
+                  <div
+                    className={`aspect-video bg-gradient-to-br ${selected.color || "from-primary-400 to-primary-600"} rounded-xl flex items-center justify-center`}
+                  >
+                    <FiImage size={80} className="text-white opacity-50" />
+                  </div>
+                )}
+              </div>
+
               <div className="mt-4 text-center">
                 <h3 className="text-white font-display font-bold text-xl">
                   {selected.title}
                 </h3>
-                {selected.description && (
-                  <p className="text-gray-400 text-sm mt-2">
-                    {selected.description}
-                  </p>
+                {selected.category && (
+                  <span className="inline-block mt-1 bg-white/10 text-white/80 text-xs px-3 py-1 rounded-full capitalize">
+                    {selected.category}
+                  </span>
                 )}
               </div>
             </motion.div>
