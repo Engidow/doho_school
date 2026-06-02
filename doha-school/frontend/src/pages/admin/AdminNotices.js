@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiBell } from "react-icons/fi";
-import api from " ../services/api";
+import api from "../services/api";
 import toast from "react-hot-toast";
 
 const CATEGORIES = ["general", "academic", "exam", "holiday", "urgent"];
