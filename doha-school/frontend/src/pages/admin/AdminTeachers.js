@@ -16,7 +16,7 @@ import {
   // FiFilter,
   FiRefreshCw,
 } from "react-icons/fi";
-import api from "../../services/api";
+import api from " ../services/api";
 import toast from "react-hot-toast";
 
 // ✅ BUG FIXED - Sawirka URL-ka production-ka si sax ah u sameeya
