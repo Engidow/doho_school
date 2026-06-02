@@ -8,7 +8,7 @@ import {
   FiImage,
   FiEdit2,
 } from "react-icons/fi";
-import api from "../../../services/api";
+import api from "../../services/api";
 import toast from "react-hot-toast";
 const getImageUrl = (photo) => {
   if (!photo) return null;

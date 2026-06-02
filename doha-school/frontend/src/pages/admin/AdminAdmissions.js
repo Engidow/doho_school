@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEye, FiTrash2, FiX, FiFilter } from "react-icons/fi";
-import api from "../services/api";
+import api from "../../services/api";
 import toast from "react-hot-toast";
 
 const STATUS_COLORS = {

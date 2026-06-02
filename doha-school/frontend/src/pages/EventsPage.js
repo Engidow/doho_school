@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiCalendar, FiMapPin, FiTag, FiImage } from "react-icons/fi";
-import api from "../../services/api";
+import api from "../services/api";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
