@@ -13,7 +13,7 @@ import {
   FiAward,
   FiBook,
   FiStar,
-  FiFilter,
+  // FiFilter,
   FiRefreshCw,
 } from "react-icons/fi";
 import api from "../../services/api";
