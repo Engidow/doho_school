@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd doha-school/frontend && npm install && npm run build",
+  "outputDirectory": "doha-school/frontend/build",
+  "installCommand": "cd doha-school/frontend && npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
