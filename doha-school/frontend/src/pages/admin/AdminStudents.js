@@ -9,8 +9,9 @@ import {
   FiUser,
   FiUpload,
 } from "react-icons/fi";
-import api from "../../services/api";
+import api from "services/api";
 import toast from "react-hot-toast";
+
 const getImageUrl = (photo) => {
   if (!photo) return null;
   if (photo.startsWith("http://") || photo.startsWith("https://")) return photo;
@@ -81,26 +82,27 @@ export default function AdminStudents() {
   const [saving, setSaving] = useState(false);
   const fileRef = useRef();
 
-  const fetchStudents = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ page, limit: 10 });
-      if (search) params.append("search", search);
-      if (grade) params.append("grade", grade);
-      const { data } = await api.get(`/students?${params}`);
-      setStudents(data.students);
-      setTotal(data.total);
-      setPages(data.pages);
-    } catch {
-      toast.error("Failed to load students");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Waa kan useEffect-ka oo dib loo habeeyey laguna dhex qariyey function-kii
   useEffect(() => {
+    const fetchStudents = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({ page, limit: 10 });
+        if (search) params.append("search", search);
+        if (grade) params.append("grade", grade);
+        const { data } = await api.get(`/students?${params}`);
+        setStudents(data.students);
+        setTotal(data.total);
+        setPages(data.pages);
+      } catch {
+        toast.error("Failed to load students");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchStudents();
-  }, [page, grade]);
+  }, [page, grade, search]); // Lagu daray search si uu toos u filtar-gareeyo marka la qoro ama la click-gareeyo
 
   const openAdd = () => {
     setEditing(null);
@@ -119,6 +121,7 @@ export default function AdminStudents() {
     setPhotoPreview(null);
     setShowModal(true);
   };
+
   const openEdit = (s) => {
     setEditing(s);
     setForm({
@@ -166,7 +169,9 @@ export default function AdminStudents() {
         toast.success("Student added!");
       }
       setShowModal(false);
-      fetchStudents();
+
+      // Si toos ah u cusbooneysii isbeddelka ka dib
+      setPage(1);
     } catch (err) {
       toast.error(err.response?.data?.message || "Error saving");
     } finally {
@@ -179,7 +184,7 @@ export default function AdminStudents() {
     try {
       await api.delete(`/students/${id}`);
       toast.success("Deleted");
-      fetchStudents();
+      setPage(1);
     } catch {
       toast.error("Delete failed");
     }
@@ -188,7 +193,6 @@ export default function AdminStudents() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchStudents();
   };
 
   return (

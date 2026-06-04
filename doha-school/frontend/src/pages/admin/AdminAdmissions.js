@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEye, FiTrash2, FiX, FiFilter } from "react-icons/fi";
-import api from "../../services/api";
+import api from "services/api";
 import toast from "react-hot-toast";
 
 const STATUS_COLORS = {
@@ -14,6 +14,7 @@ const STATUS_COLORS = {
 function ViewModal({ admission, onClose, onStatusChange }) {
   const [status, setStatus] = useState(admission.status);
   const [saving, setSaving] = useState(false);
+
   const handleUpdate = async () => {
     setSaving(true);
     try {
@@ -27,6 +28,7 @@ function ViewModal({ admission, onClose, onStatusChange }) {
       setSaving(false);
     }
   };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -127,7 +129,8 @@ export default function AdminAdmissions() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
 
-  const fetch = async () => {
+  // Waxaan u bedelnay magaca fetchAdmissions waxaana ku darnay useCallback si looga fogaado errors-ka ESLint
+  const fetchAdmissions = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page, limit: 10 });
@@ -141,18 +144,18 @@ export default function AdminAdmissions() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, status]);
 
   useEffect(() => {
-    fetch();
-  }, [page, status]);
+    fetchAdmissions();
+  }, [fetchAdmissions]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this application?")) return;
     try {
       await api.delete(`/admissions/${id}`);
       toast.success("Deleted");
-      fetch();
+      fetchAdmissions();
     } catch {
       toast.error("Delete failed");
     }
@@ -281,7 +284,7 @@ export default function AdminAdmissions() {
         <ViewModal
           admission={selected}
           onClose={() => setSelected(null)}
-          onStatusChange={fetch}
+          onStatusChange={fetchAdmissions}
         />
       )}
     </div>

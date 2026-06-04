@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FiMail, FiTrash2, FiX, FiEye, FiCheck, FiPhone } from "react-icons/fi";
-import api from "../../services/api";
+import api from "services/api";
 import toast from "react-hot-toast";
 
 function ViewModal({ contact, onClose, onUpdate }) {
@@ -15,6 +15,7 @@ function ViewModal({ contact, onClose, onUpdate }) {
       toast.error("Failed");
     }
   };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -119,7 +120,8 @@ export default function AdminContacts() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
 
-  const fetchContacts = async () => {
+  // Waxaan ku xirnay useCallback si looga hortago dib-u-abuurista function-ka mar kasta
+  const fetchContacts = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page, limit: 12 });
@@ -133,11 +135,11 @@ export default function AdminContacts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, filter]);
 
   useEffect(() => {
     fetchContacts();
-  }, [page, filter]);
+  }, [fetchContacts]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this message?")) return;

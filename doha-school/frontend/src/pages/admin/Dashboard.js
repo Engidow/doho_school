@@ -14,7 +14,7 @@ import {
   FiTrendingUp,
   FiClock,
 } from "react-icons/fi";
-import api from "../../services/api";
+import api from "services/api";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
