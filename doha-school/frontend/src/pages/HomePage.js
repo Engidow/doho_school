@@ -655,7 +655,7 @@ export default function HomePage() {
               Join Our Family
             </p>
             <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-6">
-              Admissions Open for 2024
+              Admissions Open for 2026-2027 Academic Year
             </h2>
             <p className="text-primary-100 text-lg mb-10 max-w-2xl mx-auto">
               Give your child the gift of quality education. Apply now and
